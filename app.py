@@ -1,10 +1,14 @@
-from flask import Flask, request 
+from flask import Flask, render_template
+
 app = Flask(__name__)
+
 @app.route('/')
 def home():
-         return "welcome to flask!"
-@app.route('/hello/<name>')
-def hello(name):
-         return f"hello, {name}!"
-if __name__ =='__main_':
-        app.run(debug=True)
+    return 'Hello, this is the home page'
+
+@app.route('/welcome/<name>')
+def welcome(name):
+    return render_template('index.html', name=name)
+
+if __name__ == '__main__':
+    app.run(debug=True)
