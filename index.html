@@ -3,9 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Contact Manager</title>
 </head>
 <body>
-    <h1>Hello, {{ name}}!</h1>
+    <h1>Welcome to the Contact Manager</h1>
+
+    <h2>Search Contacts</h2>
+    <form id="search-form">
+        <input type="text" id="search-query" placeholder="Search by name, phone, or email">
+        <button type="submit">Search</button>
+    </form>
+
+    <h2>Contacts</h2>
+    <div id="contact-list">
+        <!-- Contact list will be displayed here -->
+    </div>
+
+    <h2>Add New Contact</h2>
+    <form id="add-contact-form">
+        <input type="text" id="contact-name" placeholder="Name" required>
+        <input type="text" id="contact-phone" placeholder="Phone" required>
+        <input type="email" id="contact-email" placeholder="Email" required>
+        <button type="submit">Add Contact</button>
+    </form>
+
+    <script>
+        // Fetch contacts
+        function fetchContacts() {
+            fetch('/contacts')
+                .then(response => response.json())
+                .then(data => {
+                    const contactList = document.getElementById('contact-list');
+                    contactList.innerHTML = '';
+                    data.forEach(contact => {
+                        contactList.innerHTML += `<p>Name: ${contact.name}, Phone: ${contact.phone}, Email: ${contact.email}</p>`;
+                    });
+                });
+        }
+
+        // Add contact
+        document.getElementById('add-contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('contact-name').value;
+            const phone = document.getElementById('contact-phone').value;
+            const email = document.getElementById('contact-email').value;
+
+            fetch('/contacts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, phone, email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchContacts();  // Refresh the contact list
+            });
+        });
+
+        // Search contacts
+        document.getElementById('search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = document.getElementById('search-query').value;
+
+            fetch(`/contacts/search?q=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const contactList = document.getElementById('contact-list');
+                    contactList.innerHTML = '';
+                    data.forEach(contact => {
+                        contactList.innerHTML += `<p>Name: ${contact.name}, Phone: ${contact.phone}, Email: ${contact.email}</p>`;
+                    });
+                });
+        });
+
+        // Initial fetch of contacts
+        fetchContacts();
+    </script>
 </body>
 </html>
+
